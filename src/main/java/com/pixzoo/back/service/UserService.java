@@ -11,7 +11,7 @@ import com.pixzoo.back.model.Customer;
 import com.pixzoo.back.model.CustomerUpdateRequest;
 import com.pixzoo.back.repository.CustomerRepository;
 import com.pixzoo.back.repository.AdministratorRepository;
-
+import com.pixzoo.back.exceptions.*;
 @Service
 public class UserService {
 
@@ -25,8 +25,19 @@ public class UserService {
     }
 
     public Customer createCustomer(Customer customer) {
+        Customer existingCPF = customerRepository.findByCPF(customer.getCPF());
+        if (existingCPF != null) {
+            throw new ConflictException("409 Conflict: Customer with this CPF already exists");
+        }
+
+        Customer existingEmail = customerRepository.findByEmail(customer.getEmail());
+        if (existingEmail != null) {
+            throw new ConflictException("409 Conflict: Customer with this email already exists");
+        }
+
         return customerRepository.save(customer);
     }
+
 
     public Administrator createAdministrator(Administrator administrator) {
         return administratorRepository.save(administrator);
@@ -55,6 +66,7 @@ public class UserService {
 
         existingCustomer.setName(request.getName());
         existingCustomer.setEmail(request.getEmail());
+        existingCustomer.setAmountDeposited(request.getAmountDeposited());
 
         return customerRepository.save(existingCustomer);
     }

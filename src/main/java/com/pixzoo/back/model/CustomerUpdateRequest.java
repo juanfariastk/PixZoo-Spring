@@ -3,8 +3,15 @@ package com.pixzoo.back.model;
 public class CustomerUpdateRequest {
 	 private String name;
 	 private String email;
+	 private Double amountDeposited;
 	 
-	 public String getName() {
+	 public Double getAmountDeposited() {
+		return amountDeposited;
+	}
+	public void setAmountDeposited(Double amountDeposited) {
+		this.amountDeposited = amountDeposited;
+	}
+	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
@@ -16,7 +23,5 @@ public class CustomerUpdateRequest {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
-	
 
 }
