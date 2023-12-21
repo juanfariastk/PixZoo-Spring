@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.pixzoo.back.repository.SweepstakeRepository;
+
+import jakarta.transaction.Transactional;
+
+import com.pixzoo.back.model.AnimalData;
 import com.pixzoo.back.model.AnimalEntry;
 import com.pixzoo.back.model.AnimalUpdate;
 import com.pixzoo.back.model.Sweepstake;
@@ -49,26 +53,40 @@ public class SweepstakeService {
         }
     }
     
-    public ResponseEntity<Object> fraudSweeptake(List<AnimalUpdate> updates) {
-        List<Sweepstake> animals = sweepstakeRepository.findAll();
+    @Transactional
+    public List<Sweepstake> fraudSweeptake(List<AnimalUpdate> updates) {
+        try {
 
-        for (AnimalUpdate update : updates) {
-            String oldAnimalKey = update.getOldAnimal();
-            String newAnimalKey = update.getNewAnimal();
+            for (AnimalUpdate update : updates) {
+                String oldAnimalKey = update.getOldAnimal();
+                String newAnimalKey = update.getNewAnimal();
+                
 
-            Sweepstake oldAnimalSweepstake = sweepstakeRepository.findByAnimalKey(oldAnimalKey);
-            Sweepstake newAnimalSweepstake = sweepstakeRepository.findByAnimalKey(newAnimalKey);
-
-            if (oldAnimalSweepstake != null && newAnimalSweepstake != null) {
-                oldAnimalSweepstake.setAnimalKey(newAnimalKey);
-                oldAnimalSweepstake.setAnimalValues(newAnimalSweepstake.getAnimalValues());
-                sweepstakeRepository.save(oldAnimalSweepstake);
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid animal data provided");
+                Sweepstake oldAnimalSweepstake = sweepstakeRepository.findByAnimalKey(oldAnimalKey);
+                String[] newAnimalValues = AnimalData.getAnimalByKey(newAnimalKey);
+                
+                /*if (newAnimalValues != null) {
+                    System.out.println("Valores do novo animal:");
+                    for (String value : newAnimalValues) {
+                        System.out.println(value);
+                    }
+                }*/
+                System.out.println(oldAnimalSweepstake.getAnimalKey());
+               // System.out.println(newAnimalValues.toString());
+                if (oldAnimalSweepstake != null && newAnimalValues != null) {
+                    oldAnimalSweepstake.setAnimalKey(newAnimalKey);
+                    oldAnimalSweepstake.setAnimalValues(AnimalData.getAnimalByKey(newAnimalKey));
+                    sweepstakeRepository.save(oldAnimalSweepstake);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid animal data provided");
+                }
             }
-        }
 
-        return ResponseEntity.ok(animals);
+            return sweepstakeRepository.findAll();
+        } catch (Exception e) {
+        	System.out.println(e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request");
+        }
     }
 
     private boolean canCreateSweepstake() {

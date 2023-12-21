@@ -34,4 +34,7 @@ public class AnimalData {
         allAnimals.put("24-VEADO", new String[]{"93", "94", "95", "96"});
         allAnimals.put("25-VACA", new String[]{"97", "98", "99", "00"});
     }
+    public static String[] getAnimalByKey(String key) {
+        return allAnimals.get(key);
+    }
 }

@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pixzoo.back.model.AnimalEntry;
+import com.pixzoo.back.model.AnimalUpdate;
 import com.pixzoo.back.model.Sweepstake;
 import com.pixzoo.back.service.AnimalService;
 import com.pixzoo.back.service.SweepstakeService;
@@ -43,5 +45,11 @@ public class AnimalController {
     @GetMapping("/draw")
     public ResponseEntity<List<Sweepstake>> getDraws() {
         return sweepstakeService.listActualDraw();
+    }
+    
+    @PutMapping("/fraud")
+    public ResponseEntity<Object> fraudSweeptake(@RequestBody List<AnimalUpdate> updates) {
+        List<Sweepstake> animals = sweepstakeService.fraudSweeptake(updates);
+        return ResponseEntity.ok(animals);
     }
 }
